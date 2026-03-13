@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: doc-ai
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: true
+      - key: PUPPETEER_EXECUTABLE_PATH
+        value: /usr/bin/google-chrome-stable
+    # Use a custom build script or pre-deploy hook if necessary
+    # Render's native environment doesn't include Chrome out of the box,
+    # so we need a build command that installs it. We'll use a build script.

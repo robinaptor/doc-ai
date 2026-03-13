@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOC AI — Intelligence Documentaire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="noise-overlay"></div>
+
+    <!-- Cargo-style editorial top bar -->
+    <nav class="editorial-topbar">
+        <span class="topbar-logo">DOC°AI</span>
+        <span id="topbar-status">En attente d'une source</span>
+        <div class="topbar-right">
+            <button id="export-btn" class="btn-text hidden">Exporter ↓</button>
+            <span class="topbar-powered">⬡ Gemini</span>
+        </div>
+    </nav>
+
+    <!-- Sidebar for Local Storage History -->
+    <aside id="history-sidebar" class="history-sidebar">
+        <div class="history-header">Sources Récentes</div>
+        <ul id="history-list"></ul>
+    </aside>
+
+    <!-- LANDING: URL input -->
+    <section id="setup-section">
+        <header class="hero">
+            <div class="hero-eyebrow">Artefact N°001 — Documentation Intelligence</div>
+            <h1 class="hero-title">
+                <span class="line line-1">DOC</span>
+                <span class="line line-2"><em>AI</em></span>
+            </h1>
+            <p class="hero-sub">Fournissez l'URL d'une documentation.<br>L'IA répondra à vos questions, documentation en main.</p>
+        </header>
+
+        <!-- Decorative Handwritten Text -->
+        <div class="hero-handwriting">
+            <span class="hw-line1">Votre savoir,</span>
+            <span class="hw-line2">immédiat.</span>
+            <svg class="hw-underline" width="120" height="20" viewBox="0 0 120 20" fill="none"><path d="M2 15 C 30 5, 80 5, 118 10" stroke="#FF4200" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+
+        <div class="url-panel">
+            <div class="url-panel-header">
+                <span>SOURCE</span>
+                <div class="dots">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                </div>
+            </div>
+            <form id="url-form">
+                <div class="input-row">
+                    <input type="url" id="doc-url" placeholder="https://docs.example.com/..." required autocomplete="off">
+                    <button type="submit" class="btn-ingest" id="ingest-btn">
+                        <span>INGÉRER</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                    </button>
+                </div>
+                <div id="url-status" class="status-msg"></div>
+            </form>
+            <footer class="url-panel-footer">
+                <span>Moteur — Puppeteer + Cheerio</span>
+                <span>IA — Gemini 2.5 Flash</span>
+            </footer>
+        </div>
+    </section>
+
+    <!-- CHAT: active session -->
+    <section id="chat-section" class="hidden">
+        <div id="chat-history" class="chat-history">
+            <div class="msg ai-msg">
+                <div class="msg-sender">DOC-AI</div>
+                <div class="msg-body">Données ingérées. Posez votre question — je réponds en priorité avec la documentation, et avec mes connaissances générales si nécessaire.</div>
+                <div class="msg-time" id="welcome-time"></div>
+            </div>
+        </div>
+
+        <div class="chat-input-bar">
+            <form id="chat-form">
+                <textarea id="user-question" placeholder="Posez votre question..." rows="1" required></textarea>
+                <button type="submit" class="btn-ask" id="send-btn">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </button>
+            </form>
+            <div class="chat-footer">
+                <span id="loaded-url-display-bar">—</span>
+                <span>Entrée pour envoyer · Maj+Entrée pour saut de ligne</span>
+            </div>
+        </div>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>
