@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import puppeteer from 'puppeteer';
-import * as cheerio from 'cheerio';
+import axios from 'axios';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -31,46 +30,32 @@ app.post('/api/fetch-url', async (req, res) => {
   }
 
   try {
-    const browser = await puppeteer.launch({ 
-      headless: "new",
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-    
-    const page = await browser.newPage();
-    
-    // Set a realistic user agent
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    // Determine title from URL since Jina returns pure markdown
+    let pageTitle = 'Documentation';
+    try { pageTitle = new URL(url).hostname; } catch(e) {}
 
-    // Use domcontentloaded to avoid infinite waits on complex SPAs
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    
-    // Explicitly wait an extra moment to ensure client-side UI (like React) mounts text
-    await new Promise(r => setTimeout(r, 4000));
-
-    let pageTitle = await page.title();
-
-    // Extract text directly within the browser context to ensure we get what is actually rendered
-    let textContent = await page.evaluate(() => {
-        // Remove non-content elements to clean up the output
-        document.querySelectorAll('script, style, nav, footer, header, noscript, iframe, svg').forEach(el => el.remove());
-        
-        // Return the visible text of the body
-        return document.body.innerText;
+    // Use Jina Reader API to fetch and parse the URL content directly into Markdown
+    // Jina Reader is a free service specifically designed for LLMs
+    const response = await axios.get(`https://r.jina.ai/${url}`, {
+        headers: {
+            'Accept': 'text/plain'
+        },
+        timeout: 20000 // 20s timeout for Vercel functions compatibility
     });
 
-    await browser.close();
+    let textContent = response.data;
     
-    // Clean up excessive whitespace and newlines
+    // Clean up excessive whitespace and newlines but keep markdown structure
     textContent = textContent.replace(/\s+/g, ' ').trim();
     
-    // Limit text length to avoid token limits (e.g., first 30000 characters)
+    // Limit text length to avoid token limits
     if (textContent.length > 50000) {
-      textContent = textContent.substring(0, 50000) + '... [Content truncated due to length]';
+      textContent = textContent.substring(0, 50000) + '\n\n... [Contenu tronqué en raison de la longueur]';
     }
 
-    res.json({ content: textContent, title: pageTitle || url });
+    res.json({ content: textContent, title: pageTitle });
   } catch (error) {
-    console.error('Error fetching URL:', error.message);
+    console.error('Error fetching URL with Jina:', error.message);
     res.status(500).json({ error: `Erreur interne: ${error.message}` });
   }
 });
