@@ -119,6 +119,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`DocAI server running on http://localhost:${port}`);
-});
+// Only call listen when running locally (not on Vercel)
+if (process.env.VERCEL !== '1') {
+  app.listen(port, () => {
+    console.log(`DocAI server running on http://localhost:${port}`);
+  });
+}
+
+export default app;
